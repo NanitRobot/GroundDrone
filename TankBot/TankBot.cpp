@@ -31,8 +31,12 @@ void TankBot::Init() {
 };
 
 void TankBot::RunForward() {
-  //     if (debug > 1) Serial.println("Forward");
-  // if (debug > 5) return;
+#if DEBUGING
+  Serial.println("Forward");
+#if DEBUGING>5
+  return;
+#endif
+#endif
   digitalWrite(MOTOR_ENABLE, HIGH);
   setSpeeds(_speed, _speed);
   delay(DELAY_RUN);
@@ -129,6 +133,7 @@ void TankBot::Stop() {
 
 //     _speed = value;
 //   }
+
 byte TankBot::getPrevDirection() { return _prev_direction; }
 
 void TankBot::setSpeeds(short LeftSpeed, short RightSpeed) {
