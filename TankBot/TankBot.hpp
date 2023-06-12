@@ -43,5 +43,5 @@ class TankBot {
       _curent_speed,    //
       _prev_direction;  //
   short                 //
-      _speed{150};      //
+      _speed{255};      //
 };
