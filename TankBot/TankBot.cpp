@@ -13,12 +13,19 @@
 #include "TankBotConfig.hpp"
 /*
 Затримки для розворотів потрібно підібрати
+
+На затримки впливають
+  - рівень зараяду батареї
+  - напруга живлевлення
+  - внтуршіній опір джерела живлення
+
+Константи підбирається експерементальним шляхои
  */
 const int DELAY_RUN = 2;
-const int DELAY_RUN_BACK = TURN_DELAY;
-const int DELAY_ROTATE = TURN_DELAY / 2;
-const int DELAY_TURN = TURN_DELAY;
-const int DELAY_TURN_BACK = TURN_DELAY;
+const int DELAY_RUN_BACK = 400;
+const int DELAY_ROTATE = 200;
+const int DELAY_TURN = 400;
+const int DELAY_TURN_BACK = 400;
 
 void TankBot::Init() {
   pinMode(MOTOR1_A, OUTPUT);
@@ -155,6 +162,11 @@ void TankBot::Stop() {
 }
 
 #if 0
+
+/**
+ * @todo Методи потребують доопрацювання
+ * 
+ */
 void StopSlow() {
 #if DEBUG
   Serial.println("Stop slow");
@@ -195,19 +207,30 @@ void TankBot::setSpeeds(short LeftSpeed, short RightSpeed) {
   return;
 #endif
 #endif
+  // Ігнорувати значення більші від 255 для уникнення переповенення
   if (abs(LeftSpeed) <= 255)
-    if (LeftSpeed >= 0) {
+    if (LeftSpeed >= 0) 
+    // пряме обертання
+    {
       analogWrite(MOTOR1_A, LeftSpeed);
       digitalWrite(MOTOR1_B, LOW);
-    } else {
+    } else
+    // реверсне обертання
+    {
       digitalWrite(MOTOR1_A, LOW);
       analogWrite(MOTOR1_B, -LeftSpeed);
     }
+
+  // Ігнорувати значення більші від 255 для уникнення переповенення
   if (abs(RightSpeed) <= 255)
-    if (RightSpeed >= 0) {
+    if (RightSpeed >= 0)
+    // пряме обертання
+    {
       analogWrite(MOTOR2_A, RightSpeed);
       digitalWrite(MOTOR2_B, LOW);
-    } else {
+    } else
+    // реверсне обертання
+    {
       analogWrite(MOTOR2_A, LOW);
       digitalWrite(MOTOR2_B, -RightSpeed);
     }

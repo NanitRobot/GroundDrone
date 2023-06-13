@@ -25,41 +25,70 @@ const int  //
 // Detection distance: 2cm--450cm
 const int                      //
     SONIC_DISTANCE_MAX = 450,  //
-    SONIC_DISTANCE_MIN = 2;    //
-
+    SONIC_DISTANCE_MIN = 2,    //
+    DroneSpeed = 120,          ///< Швидкість дрона
+    HuckClosed = 160,          ///< Гак закрито
+    HuckOpened = 0,            ///< Гак відкрито
+    MovingTime = 15000,  ///< Час активного пошуку в мілісекундах
+    JobTime = 15000  ///< Час на виеонання завдання
+    ;
 TankBot    //
-    Tank;  //
+    Tank;  ///< Tank
 Servo      //
-    Huck;  //
+    Huck;  ///< Виконавчий механізм
 
-void Moving();
+bool detected{false}, PIRDetected{};
 
-void setup() {
+bool                  //
+    IsActive{false},  ///< Прапор активності машинки в режимі пошуку
+    IsArmed{false};  ///< Заряджено. Виконання завдання
+long                 //
+    ListenTime,  ///< Змінна рахунку часу виконнання завдання
+    ActiveTime{millis()};  ///< Змінна рахунку часу пошуку
+
+void Moving();  ///< Оголошення функції яка описує алгоритм руху дрона
+void Drop();  ///< Оголошення функції яка виконує завдання
+
+#if NOT_USED_CODE
+void PIR_INT() {
+  if (ActiveTime > millis())
+    if (IsArmed and !IsActive) PIRDetected = true;
+};
+#endif
+
+void setup()  ///< Функція налаштувань дрона
+{
   Nanit_Base_Start();
-  Tank.Init();
-  // // void Nanit_Base_Start 	();
-  Serial.begin(9600);  // set up Serial library at 9600 bps
-  // if (debug > 1) Serial.println(VERSION);
+  Tank.Init();  ///< Об'єкт танк
 
+#ifdef DEBUGING
+  Serial.begin(9600);  // set up Serial library at 9600 bps
+#endif
+
+  // Піни ульразвукового далекоміру
   pinMode(SONIC_PIN_TRIG, OUTPUT);
   pinMode(SONIC_PIN_ECHO, INPUT);
-
+  // Піни дачиків "стіни" на бортах
   pinMode(LEFT_BORT_PIN, INPUT);
   pinMode(RIGHT_BORT_PIN, INPUT);
-
+  // "кнопка"
   pinMode(LIGHT_SENOSR_PIN, INPUT);
-
+  // Детектор руху
+  pinMode(PIR_SENSOR_PIN, INPUT);
+  // Базер
   pinMode(BUZZ_PIN, OUTPUT);
 #ifdef USED_ACTIVE_BAZZER
+  // код для пасивного базера
   digitalWrite(BUZZ_PIN, HIGH);
 #endif
 
 #if DEBUGING
   delay(3000);
 #endif
+  // attachInterrupt(digitalPinToInterrupt(PIR_SENSOR_PIN), PIR_INT, CHANGE);
   Huck.attach(P1_1);
-  Huck.write(90);
-  Tank.setSpeed(120);
+  Huck.write(HuckClosed);
+  Tank.setSpeed(DroneSpeed);
 }
 
 // Возвращает расстояние до препятствия в сантиметрах
@@ -96,14 +125,7 @@ int measureDistance() {
 
 // #define DEBUGING
 
-bool                  //
-    IsActive{false},  //
-    IsArmed{false};   //
-
-auto                         //
-    milliseconds{millis()};  //
 void loop() {
-  Huck.write(90);
 #ifdef DEBUGING
   Serial.println("\n*** new loop() start ***\n");
 #endif
@@ -138,33 +160,52 @@ void loop() {
       tone(BUZZ_PIN, freg, buzz_delay);
       noTone();
 #endif
-      milliseconds = 15000 + millis();
+      ActiveTime = MovingTime + millis();
+      Huck.write(HuckClosed);
     }
     IsArmed = true;
   }
 
   digitalWrite(BUZZ_PIN, HIGH);
 
-  /* if (IsArmed and !IsActive and milliseconds < millis()) {
+  /* if (IsArmed and !IsActive and IsActive < millis()) {
      //скид
    }*/
+  if (IsActive) {
+    PIRDetected = false;
+    Moving();
+    if (IsArmed and (millis() > ActiveTime)) {
+      IsActive = false;
+      ListenTime = JobTime + millis();
+    }
 
-  // Бот активний
-  if (IsActive) Moving();
+  } else if (IsArmed) {
+    Tank.Stop();
+    if (millis() > ListenTime) {
+      IsActive = true;
+      ActiveTime = MovingTime + millis();
+    }
+    if (digitalRead(PIR_SENSOR_PIN)) {
+      Drop();
+      Tank.setSpeed(0xFF);
+      for (;;) Moving();
+    }
+  };
 }
 
 void Moving() {
   int                                //
-      distance = measureDistance(),  // Отримуємо дистанцію до перешкоди
-      ch;                            //
+      distance = measureDistance();  // Отримуємо дистанцію до перешкоди
+              
 #ifdef DEBUGING
-  // Вимірювання відстані
   Serial.print("distance = ");
   Serial.println(distance);
 #endif
   // Tank.setSpeed(map(distance,150,255,SONIC_DISTANCE_MIN,SONIC_DISTANCE_MAX));
+  // Вимірювання відстані
   if (distance <= DST_TRH_BACK)  // Якщо дуже близько портібно їхати назад
   {
+    
 #ifdef DEBUGING
     Serial.println("ALARM! Distance too small!!!");
 #endif
@@ -199,7 +240,7 @@ void Moving() {
   } else {
     Tank.Stop();
     randomSeed(millis());
-    if (random(1, 10) > 5) {
+    if (random(1, 10) < 5) {
 #ifdef DEBUGING
       delay(500);
 #endif
@@ -215,16 +256,25 @@ void Moving() {
   // Під'їздимо до стіни під кутом.
   // Ультрасонік бачить об'єкутів під кутом
   // повертаємо доки не зникне перешкода
-  // if (1)
   {
+    // Визначаємо час на виконання повороту
     const long nodelay{2000};
+    // Якщо підїхали бортом до стіни
     if (!digitalRead(LEFT_BORT_PIN)) {
+      // трохи повертаємо
       Tank.TurnBackRight();
       long wait{millis() + nodelay};
+      // повертаємо доки не відїдемо від стіни
       while (!digitalRead(LEFT_BORT_PIN))
-        if (wait < millis()) break;
+        // якщо поворот не вдалий протягом визначеного часу
+        if (wait < millis())
+          // забуксували
+          // припиняємо поворот
+          break;
+      // їдемо далі
       Tank.RunForward();
     }
+    // теж заме для правого борту
     if (!digitalRead(RIGHT_BORT_PIN)) {
       Tank.TurnBackLeft();
       long wait{millis() + nodelay};
@@ -233,4 +283,11 @@ void Moving() {
       Tank.RunForward();
     }
   }
+}
+
+void Drop() {
+  /// Виконуємо корисну роботу
+  Huck.write(HuckOpened);
+  // Затримка на відкриття
+  delay(100);
 }
