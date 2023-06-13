@@ -16,7 +16,7 @@
  */
 const int DELAY_RUN = 2;
 const int DELAY_RUN_BACK = TURN_DELAY;
-const int DELAY_ROTATE = TURN_DELAY;
+const int DELAY_ROTATE = TURN_DELAY / 2;
 const int DELAY_TURN = TURN_DELAY;
 const int DELAY_TURN_BACK = TURN_DELAY;
 
@@ -29,6 +29,8 @@ void TankBot::Init() {
   pinMode(MOTOR_ENABLE, OUTPUT);
   pinMode(ENABLE_DRV_PIN, OUTPUT);
 };
+
+void TankBot::setSpeed(short value) { _speed = value; }
 
 void TankBot::RunForward() {
 #if DEBUGING
@@ -193,18 +195,20 @@ void TankBot::setSpeeds(short LeftSpeed, short RightSpeed) {
   return;
 #endif
 #endif
-  if ((abs(LeftSpeed) <= 255) and (LeftSpeed >= 0)) {
-    analogWrite(MOTOR1_A, LeftSpeed);
-    digitalWrite(MOTOR1_B, LOW);
-  } else {
-    analogWrite(MOTOR1_A, LOW);
-    digitalWrite(MOTOR1_B, -LeftSpeed);
-  }
-  if ((abs(RightSpeed) <= 255) and (RightSpeed >= 0)) {
-    analogWrite(MOTOR2_A, RightSpeed);
-    digitalWrite(MOTOR2_B, LOW);
-  } else {
-    analogWrite(MOTOR2_A, LOW);
-    digitalWrite(MOTOR2_B, -RightSpeed);
-  }
+  if (abs(LeftSpeed) <= 255)
+    if (LeftSpeed >= 0) {
+      analogWrite(MOTOR1_A, LeftSpeed);
+      digitalWrite(MOTOR1_B, LOW);
+    } else {
+      digitalWrite(MOTOR1_A, LOW);
+      analogWrite(MOTOR1_B, -LeftSpeed);
+    }
+  if (abs(RightSpeed) <= 255)
+    if (RightSpeed >= 0) {
+      analogWrite(MOTOR2_A, RightSpeed);
+      digitalWrite(MOTOR2_B, LOW);
+    } else {
+      analogWrite(MOTOR2_A, LOW);
+      digitalWrite(MOTOR2_B, -RightSpeed);
+    }
 }

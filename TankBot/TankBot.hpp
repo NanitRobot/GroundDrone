@@ -26,6 +26,7 @@ const byte                   //
 class TankBot {
  public:
   void Init();           ///< Ініціалізація моторів
+  void setSpeed(short);  ///< Вказати швидкість руху
   void RunForward();     ///< Рухаємось вперед прямо
   void RunBackward();    ///< Назад прямо
   void RotateRight();    ///< Правий розворот на місці

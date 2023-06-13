@@ -17,7 +17,7 @@
  */
 #define USED_ACTIVE_BAZZER
 
-#define TURN_DELAY (700)
+#define TURN_DELAY (400)
 // PORT 1
 #define GAS_SENSOR_PIN   (P1_1)  ///< Використовується АЦП
 #define LIGHT_SENOSR_PIN (P1_2)  ///< Використовується АЦП

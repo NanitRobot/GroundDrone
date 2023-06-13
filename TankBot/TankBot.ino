@@ -32,6 +32,8 @@ TankBot    //
 Servo      //
     Huck;  //
 
+void Moving();
+
 void setup() {
   Nanit_Base_Start();
   Tank.Init();
@@ -57,6 +59,7 @@ void setup() {
 #endif
   Huck.attach(P1_1);
   Huck.write(90);
+  Tank.setSpeed(120);
 }
 
 // Возвращает расстояние до препятствия в сантиметрах
@@ -147,85 +150,87 @@ void loop() {
    }*/
 
   // Бот активний
-  if (IsActive /* and (milliseconds < millis())*/)
+  if (IsActive) Moving();
+}
 
+void Moving() {
+  int                                //
+      distance = measureDistance(),  // Отримуємо дистанцію до перешкоди
+      ch;                            //
+#ifdef DEBUGING
+  // Вимірювання відстані
+  Serial.print("distance = ");
+  Serial.println(distance);
+#endif
+  // Tank.setSpeed(map(distance,150,255,SONIC_DISTANCE_MIN,SONIC_DISTANCE_MAX));
+  if (distance <= DST_TRH_BACK)  // Якщо дуже близько портібно їхати назад
   {
-    int                                //
-        distance = measureDistance(),  // Отримуємо дистанцію до перешкоди
-        ch;                            //
 #ifdef DEBUGING
-    // Вимірювання відстані
-    Serial.print("distance = ");
-    Serial.println(distance);
+    Serial.println("ALARM! Distance too small!!!");
 #endif
-    if (distance <= DST_TRH_BACK)  // Якщо дуже близько портібно їхати назад
-    {
+    Tank.Stop();  // Зупиняємось
 #ifdef DEBUGING
-      Serial.println("ALARM! Distance too small!!!");
-#endif
-      Tank.Stop();  // Зупиняємось
-#ifdef DEBUGING
-      delay(1000);
+    delay(1000);
 #endif
 
-      if (Tank.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
-        Tank.RotateRight();
-      } else {
-        Tank.RotateLeft();
-      }
-
-      // Раніше повертали заднім ходом на ліво?
-      if (Tank.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
-        Tank.RotateRight();
-      } else {
-        Tank.RotateLeft();
-      }
-
-#ifdef DEBUGING
-      delay(1000);
-#endif
-
-      Tank.RunBackward();
-      return;  // ПОчати новий loop()
-    }
-    // прямо
-    if (distance > DST_TRH_TURN) {
-      Tank.RunForward();
+    if (Tank.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
+      Tank.RotateRight();
     } else {
-      Tank.Stop();
-      randomSeed(millis());
-      if (random(1, 10) > 5) {
-#ifdef DEBUGING
-        delay(500);
-#endif
-        Tank.TurnLeft();
-      } else {
-#ifdef DEBUGING
-        delay(500);
-#endif
-        Tank.TurnRight();
-      }
+      Tank.RotateLeft();
     }
 
-    // Під'їздимо до стіни під кутом.
-    // Ультрасонік бачить об'єкутів під кутом
-    // повертаємо доки не зникне перешкода
-    // if (1)
-    {
-      if (!digitalRead(LEFT_BORT_PIN)) {
-        Tank.TurnBackRight();
-        while (!digitalRead(LEFT_BORT_PIN))
-          ;
-        Tank.RunForward();
-      }
-      if (!digitalRead(RIGHT_BORT_PIN)) {
-        Tank.TurnBackLeft();
-        while (!digitalRead(RIGHT_BORT_PIN))
-          ;
-        Tank.RunForward();
-      }
+    // Раніше повертали заднім ходом на ліво?
+    if (Tank.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
+      Tank.RotateRight();
+    } else {
+      Tank.RotateLeft();
+    }
+
+#ifdef DEBUGING
+    delay(1000);
+#endif
+
+    Tank.RunBackward();
+    return;  // ПОчати новий loop()
+  }
+  // прямо
+  if (distance > DST_TRH_TURN) {
+    Tank.RunForward();
+  } else {
+    Tank.Stop();
+    randomSeed(millis());
+    if (random(1, 10) > 5) {
+#ifdef DEBUGING
+      delay(500);
+#endif
+      Tank.TurnLeft();
+    } else {
+#ifdef DEBUGING
+      delay(500);
+#endif
+      Tank.TurnRight();
     }
   }
-  /* else if (IsArmed)
-    milliseconds = 15000 + millis()*/
+
+  // Під'їздимо до стіни під кутом.
+  // Ультрасонік бачить об'єкутів під кутом
+  // повертаємо доки не зникне перешкода
+  // if (1)
+  {
+    const long nodelay{2000};
+    if (!digitalRead(LEFT_BORT_PIN)) {
+      Tank.TurnBackRight();
+      long wait{millis() + nodelay};
+      while (!digitalRead(LEFT_BORT_PIN))
+        if (wait < millis()) break;
+      Tank.RunForward();
+    }
+    if (!digitalRead(RIGHT_BORT_PIN)) {
+      Tank.TurnBackLeft();
+      long wait{millis() + nodelay};
+      while (!digitalRead(RIGHT_BORT_PIN))
+        if (wait < millis()) break;
+      Tank.RunForward();
+    }
+  }
 }
