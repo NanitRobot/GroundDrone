@@ -23,7 +23,8 @@ const int  //
     DST_TRH_BACK = 15;
 
 // Detection distance: 2cm--450cm
-const int                      //
+const int  //
+    TURN_DELAY = 152,          //
     SONIC_DISTANCE_MAX = 450,  //
     SONIC_DISTANCE_MIN = 2,    //
     DroneSpeed = 120,          ///< Швидкість дрона
@@ -196,7 +197,7 @@ void loop() {
 void Moving() {
   int                                //
       distance = measureDistance();  // Отримуємо дистанцію до перешкоди
-              
+
 #ifdef DEBUGING
   Serial.print("distance = ");
   Serial.println(distance);
@@ -205,7 +206,6 @@ void Moving() {
   // Вимірювання відстані
   if (distance <= DST_TRH_BACK)  // Якщо дуже близько портібно їхати назад
   {
-    
 #ifdef DEBUGING
     Serial.println("ALARM! Distance too small!!!");
 #endif
