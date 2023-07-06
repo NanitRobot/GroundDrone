@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorTheme": "Abyss",
+		"files.autoSave": "onFocusChange"
+	}
+}
