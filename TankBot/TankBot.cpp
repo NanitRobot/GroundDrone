@@ -209,7 +209,7 @@ void TankBot::setSpeeds(short LeftSpeed, short RightSpeed) {
 #endif
   // Ігнорувати значення більші від 255 для уникнення переповенення
   if (abs(LeftSpeed) <= 255)
-    if (LeftSpeed >= 0) 
+    if (LeftSpeed >= 0)
     // пряме обертання
     {
       analogWrite(MOTOR1_A, LeftSpeed);
@@ -231,7 +231,7 @@ void TankBot::setSpeeds(short LeftSpeed, short RightSpeed) {
     } else
     // реверсне обертання
     {
-      analogWrite(MOTOR2_A, LOW);
-      digitalWrite(MOTOR2_B, -RightSpeed);
+      digitalWrite(MOTOR2_A, LOW);
+      analogWrite(MOTOR2_B, -RightSpeed);
     }
 }
