@@ -1,5 +1,5 @@
 /**
- * @file TankBot.hpp
+ * @file GroundDrone.hpp
  * @author Sam4uk
  * @brief
  * @version 0.1
@@ -23,7 +23,7 @@ const byte                   //
     MOTOR_TURN_BACK_RIGHT = 4,  // поворот праворуч заднім ходом
     MOTOR_TURN_BACK_LEFT = 5;  // поворот ліворуч заднім ходом
 
-class TankBot {
+class GroundDrone {
  public:
   void Init();           ///< Ініціалізація моторів
   void setSpeed(short);  ///< Вказати швидкість руху

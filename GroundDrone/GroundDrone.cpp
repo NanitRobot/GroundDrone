@@ -1,5 +1,5 @@
 /**
- * @file TankBot.cpp
+ * @file GroundDrone.cpp
  * @author Sam4uk
  * @brief
  * @version 0.1
@@ -27,7 +27,7 @@ const int DELAY_ROTATE = 200;
 const int DELAY_TURN = 400;
 const int DELAY_TURN_BACK = 400;
 
-void TankBot::Init() {
+void GroundDrone::Init() {
   pinMode(MOTOR1_A, OUTPUT);
   pinMode(MOTOR1_B, OUTPUT);
   pinMode(MOTOR2_A, OUTPUT);
@@ -37,9 +37,9 @@ void TankBot::Init() {
   pinMode(ENABLE_DRV_PIN, OUTPUT);
 };
 
-void TankBot::setSpeed(short value) { _speed = value; }
+void GroundDrone::setSpeed(short value) { _speed = value; }
 
-void TankBot::RunForward() {
+void GroundDrone::RunForward() {
 #if DEBUGING
   Serial.println("Forward");
 #if (DEBUGING > 5)
@@ -52,7 +52,7 @@ void TankBot::RunForward() {
   delay(DELAY_RUN);
 };
 
-void TankBot::RunBackward() {
+void GroundDrone::RunBackward() {
 #if DEBUGING
   Serial.println("Backward");
 #if (DEBUGING > 5)
@@ -65,7 +65,7 @@ void TankBot::RunBackward() {
   delay(DELAY_RUN);
 };
 
-void TankBot::RotateRight() {
+void GroundDrone::RotateRight() {
 #if DEBUGING
   Serial.println("RotateRight");
 #if (DEBUGING > 5)
@@ -79,7 +79,7 @@ void TankBot::RotateRight() {
   delay(DELAY_ROTATE);
 };
 
-void TankBot::TurnRight() {
+void GroundDrone::TurnRight() {
 #if DEBUGING
   Serial.println("TurnRight");
 #if (DEBUGING > 5)
@@ -93,7 +93,7 @@ void TankBot::TurnRight() {
   delay(DELAY_TURN);
 };
 
-void TankBot::TurnBackRight() {
+void GroundDrone::TurnBackRight() {
 #if DEBUGING
   Serial.println("TurnBackRight");
 #if (DEBUGING > 5)
@@ -107,7 +107,7 @@ void TankBot::TurnBackRight() {
   delay(DELAY_TURN);
 }
 
-void TankBot::RotateLeft() {
+void GroundDrone::RotateLeft() {
 #if DEBUGING
   Serial.println("RotateLeft");
 #if (DEBUGING > 5)
@@ -121,7 +121,7 @@ void TankBot::RotateLeft() {
   delay(DELAY_ROTATE);
 }
 
-void TankBot::TurnLeft() {
+void GroundDrone::TurnLeft() {
 #if DEBUGING
   Serial.println("TurnLeft");
 #if (DEBUGING > 5)
@@ -135,7 +135,7 @@ void TankBot::TurnLeft() {
   delay(DELAY_ROTATE);
 }
 
-void TankBot::TurnBackLeft() {
+void GroundDrone::TurnBackLeft() {
 #if DEBUGING
   Serial.println("TurnBackLeft");
 #if (DEBUGING > 5)
@@ -149,7 +149,7 @@ void TankBot::TurnBackLeft() {
   delay(DELAY_ROTATE);
 }
 
-void TankBot::Stop() {
+void GroundDrone::Stop() {
 #if DEBUGING
   Serial.println("Stop");
 #if (DEBUGING > 5)
@@ -187,7 +187,7 @@ void StopSlow() {
 // void RunSlow() { setSpeed(255); }
 #endif
 
-byte TankBot::getPrevDirection() { return _prev_direction; }
+byte GroundDrone::getPrevDirection() { return _prev_direction; }
 /**
  * @brief Задає швидкість обертання двигунів
  *
@@ -200,7 +200,7 @@ byte TankBot::getPrevDirection() { return _prev_direction; }
  * @param RightSpeed Швидкість обертання правого двигуна
  */
 
-void TankBot::setSpeeds(short LeftSpeed, short RightSpeed) {
+void GroundDrone::setSpeeds(short LeftSpeed, short RightSpeed) {
 #if DEBUGING
   Serial.println("Forward");
 #if DEBUGING > 5

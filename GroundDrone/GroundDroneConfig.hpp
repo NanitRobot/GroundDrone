@@ -1,6 +1,6 @@
 /**
  * @file GroundDroneConfig.hpp
- * @author your name (you@domain.com)
+ * @author Sam4uk
  * @brief
  * @version 0.1
  * @date 2023-06-12

@@ -33,8 +33,8 @@ const int  //
     MovingTime = 15000,  ///< Час активного пошуку в мілісекундах
     JobTime = 15000  ///< Час на виеонання завдання
     ;
-TankBot    //
-    Tank;  ///< Tank
+GroundDrone    //
+    Drone;  ///< Drone
 Servo      //
     Huck;  ///< Виконавчий механізм
 
@@ -60,7 +60,7 @@ void PIR_INT() {
 void setup()  ///< Функція налаштувань дрона
 {
   Nanit_Base_Start();
-  Tank.Init();  ///< Об'єкт танк
+  Drone.Init();  ///< Об'єкт танк
 
 #ifdef DEBUGING
   Serial.begin(9600);  // set up Serial library at 9600 bps
@@ -89,7 +89,7 @@ void setup()  ///< Функція налаштувань дрона
   // attachInterrupt(digitalPinToInterrupt(PIR_SENSOR_PIN), PIR_INT, CHANGE);
   Huck.attach(P1_1);
   Huck.write(HuckClosed);
-  Tank.setSpeed(DroneSpeed);
+  Drone.setSpeed(DroneSpeed);
 }
 
 // Возвращает расстояние до препятствия в сантиметрах
@@ -133,7 +133,7 @@ void loop() {
 
   // Активація бота в режим об'їду
   if (!digitalRead(LEFT_BORT_PIN) and !digitalRead(RIGHT_BORT_PIN)) {
-    Tank.RunBackward();
+    Drone.RunBackward();
     delay(TURN_DELAY);
     IsActive = true;
   }
@@ -181,14 +181,14 @@ void loop() {
     }
 
   } else if (IsArmed) {
-    Tank.Stop();
+    Drone.Stop();
     if (millis() > ListenTime) {
       IsActive = true;
       ActiveTime = MovingTime + millis();
     }
     if (digitalRead(PIR_SENSOR_PIN)) {
       Drop();
-      Tank.setSpeed(0xFF);
+      Drone.setSpeed(0xFF);
       for (;;) Moving();
     }
   };
@@ -202,54 +202,54 @@ void Moving() {
   Serial.print("distance = ");
   Serial.println(distance);
 #endif
-  // Tank.setSpeed(map(distance,150,255,SONIC_DISTANCE_MIN,SONIC_DISTANCE_MAX));
+  // Drone.setSpeed(map(distance,150,255,SONIC_DISTANCE_MIN,SONIC_DISTANCE_MAX));
   // Вимірювання відстані
   if (distance <= DST_TRH_BACK)  // Якщо дуже близько портібно їхати назад
   {
 #ifdef DEBUGING
     Serial.println("ALARM! Distance too small!!!");
 #endif
-    Tank.Stop();  // Зупиняємось
+    Drone.Stop();  // Зупиняємось
 #ifdef DEBUGING
     delay(1000);
 #endif
 
-    if (Tank.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
-      Tank.RotateRight();
+    if (Drone.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
+      Drone.RotateRight();
     } else {
-      Tank.RotateLeft();
+      Drone.RotateLeft();
     }
 
     // Раніше повертали заднім ходом на ліво?
-    if (Tank.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
-      Tank.RotateRight();
+    if (Drone.getPrevDirection() == MOTOR_TURN_BACK_LEFT) {
+      Drone.RotateRight();
     } else {
-      Tank.RotateLeft();
+      Drone.RotateLeft();
     }
 
 #ifdef DEBUGING
     delay(1000);
 #endif
 
-    Tank.RunBackward();
+    Drone.RunBackward();
     return;  // ПОчати новий loop()
   }
   // прямо
   if (distance > DST_TRH_TURN) {
-    Tank.RunForward();
+    Drone.RunForward();
   } else {
-    Tank.Stop();
+    Drone.Stop();
     randomSeed(millis());
     if (random(1, 10) < 5) {
 #ifdef DEBUGING
       delay(500);
 #endif
-      Tank.TurnLeft();
+      Drone.TurnLeft();
     } else {
 #ifdef DEBUGING
       delay(500);
 #endif
-      Tank.TurnRight();
+      Drone.TurnRight();
     }
   }
 
@@ -262,7 +262,7 @@ void Moving() {
     // Якщо підїхали бортом до стіни
     if (!digitalRead(LEFT_BORT_PIN)) {
       // трохи повертаємо
-      Tank.TurnBackRight();
+      Drone.TurnBackRight();
       long wait{millis() + nodelay};
       // повертаємо доки не відїдемо від стіни
       while (!digitalRead(LEFT_BORT_PIN))
@@ -272,15 +272,15 @@ void Moving() {
           // припиняємо поворот
           break;
       // їдемо далі
-      Tank.RunForward();
+      Drone.RunForward();
     }
     // теж заме для правого борту
     if (!digitalRead(RIGHT_BORT_PIN)) {
-      Tank.TurnBackLeft();
+      Drone.TurnBackLeft();
       long wait{millis() + nodelay};
       while (!digitalRead(RIGHT_BORT_PIN))
         if (wait < millis()) break;
-      Tank.RunForward();
+      Drone.RunForward();
     }
   }
 }
