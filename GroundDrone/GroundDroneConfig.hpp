@@ -1,5 +1,5 @@
 /**
- * @file TankBotConfig.hpp
+ * @file GroundDroneConfig.hpp
  * @author your name (you@domain.com)
  * @brief
  * @version 0.1
@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023
  *
  */
-#ifndef _TANKCONFIG_HPP_
-#define _TANKCONFIG_HPP_
+#ifndef _GROND_DRONE_CONFIG_HPP_
+#define _GROND_DRONE_CONFIG_HPP_
 
 /* пины для подключения HC-SR04 Ultrasonic Module Distance Measuring
  * 13, 2 цифровые пины

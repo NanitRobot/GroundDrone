@@ -8,9 +8,9 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "TankBot.hpp"
+#include "GroundDrone.hpp"
 
-#include "TankBotConfig.hpp"
+#include "GroundDroneConfig.hpp"
 /*
 Затримки для розворотів потрібно підібрати
 

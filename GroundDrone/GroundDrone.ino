@@ -1,5 +1,5 @@
 /**
- * @file TankBot.ino
+ * @file GroundDrone.ino
  * @author Sam4uk
  * @brief
  * @version 0.1
@@ -10,8 +10,8 @@
  */
 #include <Servo.h>
 
-#include "TankBot.hpp"
-#include "TankBotConfig.hpp"
+#include "GroundDrone.hpp"
+#include "GroundDroneConfig.hpp"
 
 #define DEBUGING 1
 
